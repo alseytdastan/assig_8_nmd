@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "716115321910",
+    "project_id": "weatherfinal-e9258",
+    "storage_bucket": "weatherfinal-e9258.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:716115321910:android:a213befb4ad3008f3fe497",
+        "android_client_info": {
+          "package_name": "com.dastan.weatherfinal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQSJ3w07l2Hb6KrCF3qzhhhYaIpfsBydI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

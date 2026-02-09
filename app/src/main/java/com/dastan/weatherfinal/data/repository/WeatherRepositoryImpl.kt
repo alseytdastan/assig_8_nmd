@@ -11,20 +11,17 @@ class WeatherRepositoryImpl : WeatherRepository {
         val trimmed = city.trim()
         require(trimmed.isNotEmpty()) { "City name cannot be empty" }
 
-        // 1. Geocoding to get coordinates
         val geo = ApiClient.geocodingApi.geocode(trimmed)
         val first = geo.results.firstOrNull() ?: throw Exception("City '$trimmed' not found")
 
         val unitParam = if (units == Units.C) "celsius" else "fahrenheit"
 
-        // 2. Forecast using coordinates
         val dto = ApiClient.forecastApi.forecast(
             lat = first.latitude,
             lon = first.longitude,
             temperatureUnit = unitParam
         )
 
-        // 3. Map to domain model
         return dto.toWeather(first.name)
     }
 }

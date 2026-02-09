@@ -10,6 +10,5 @@ data class Favorite(
     val createdAt: Long = 0L,
     val createdBy: String = ""
 ) {
-    // Required empty constructor for Firebase
     constructor() : this("", "", "", 0L, "")
 }

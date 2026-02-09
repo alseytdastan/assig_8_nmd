@@ -7,13 +7,12 @@ plugins {
 
 android {
     namespace = "com.dastan.weatherfinal"
-    // ПОДНИМАЕМ ДО 36 (требование новых библиотек androidx)
     compileSdk = 36
 
     defaultConfig {
         applicationId = "com.dastan.weatherfinal"
         minSdk = 24
-        targetSdk = 36 // Также рекомендуется поднять до 36
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 

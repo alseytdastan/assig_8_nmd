@@ -1,5 +1,8 @@
 package com.dastan.weatherfinal.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Weather(
     val city: String,
     val temp: Double,
@@ -10,6 +13,7 @@ data class Weather(
     val forecast: List<ForecastDay>
 )
 
+@Serializable
 data class ForecastDay(
     val date: String,
     val min: Double,
@@ -17,4 +21,5 @@ data class ForecastDay(
     val condition: String
 )
 
+@Serializable
 enum class Units { C, F }

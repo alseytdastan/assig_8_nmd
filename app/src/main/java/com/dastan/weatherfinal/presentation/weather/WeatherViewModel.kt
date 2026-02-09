@@ -4,16 +4,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dastan.weatherfinal.data.local.SettingsDataStore
+import com.dastan.weatherfinal.data.local.WeatherDataStore
 import com.dastan.weatherfinal.data.local.WeatherCache
 import com.dastan.weatherfinal.data.repository.WeatherRepository
 import com.dastan.weatherfinal.data.repository.WeatherRepositoryImpl
 import com.dastan.weatherfinal.domain.model.Units
 import com.dastan.weatherfinal.domain.model.Weather
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 data class WeatherUiState(
@@ -31,6 +28,7 @@ class WeatherViewModel(
 ) : AndroidViewModel(app) {
 
     private val settings = SettingsDataStore(app)
+    private val weatherDataStore = WeatherDataStore(app)
     private val _state = MutableStateFlow(WeatherUiState())
     val state: StateFlow<WeatherUiState> = _state.asStateFlow()
 
@@ -38,12 +36,16 @@ class WeatherViewModel(
         viewModelScope.launch {
             settings.unitsFlow.collectLatest { u ->
                 _state.update { it.copy(units = u) }
-                if (_state.value.data != null) {
-                    search()
+                if (_state.value.data != null) search()
+            }
+        }
+        viewModelScope.launch {
+            weatherDataStore.cachedWeather.collectLatest { cached ->
+                if (cached != null && _state.value.data == null) {
+                    _state.update { it.copy(data = cached, isOffline = true) }
                 }
             }
         }
-        _state.update { it.copy(data = WeatherCache.last) }
     }
 
     fun onQueryChange(newQuery: String) {
@@ -52,25 +54,26 @@ class WeatherViewModel(
 
     fun toggleUnits() {
         val next = if (_state.value.units == Units.C) Units.F else Units.C
-        viewModelScope.launch {
-            settings.saveUnits(next)
-        }
+        viewModelScope.launch { settings.saveUnits(next) }
     }
+
     fun search() = viewModelScope.launch {
         val city = _state.value.query
         if (city.isBlank()) {
             _state.update { it.copy(error = "Please enter a city name") }
             return@launch
         }
+
         _state.update { it.copy(isLoading = true, error = null, isOffline = false) }
 
         try {
             val weather = repo.getWeather(city, _state.value.units)
+
+            weatherDataStore.saveWeather(weather)
             WeatherCache.last = weather
             _state.update { it.copy(isLoading = false, data = weather, error = null) }
         } catch (e: Exception) {
-            val cached = WeatherCache.last
-            if (cached != null) {
+            weatherDataStore.cachedWeather.firstOrNull()?.let { cached ->
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -79,13 +82,9 @@ class WeatherViewModel(
                         isOffline = true
                     )
                 }
-            } else {
-                _state.update { 
-                    it.copy(
-                        isLoading = false, 
-                        error = e.message ?: "An unknown error occurred",
-                        isOffline = true 
-                    ) 
+            } ?: run {
+                _state.update {
+                    it.copy(isLoading = false, error = e.message ?: "Error", isOffline = true)
                 }
             }
         }

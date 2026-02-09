@@ -55,7 +55,6 @@ fun WeatherScreen() {
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // --- Search row ---
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -80,13 +79,11 @@ fun WeatherScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- Loading State ---
             if (state.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             } else {
-                // --- Error / Offline Banner ---
                 state.error?.let {
                     Card(
                         colors = CardDefaults.cardColors(
@@ -105,7 +102,6 @@ fun WeatherScreen() {
                     }
                 }
 
-                // --- Weather content ---
                 if (state.data != null) {
                     WeatherContent(state.data!!, state.units)
                 } else if (state.error == null) {
@@ -126,7 +122,6 @@ fun WeatherContent(w: com.dastan.weatherfinal.domain.model.Weather, units: Units
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            // Current Weather Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)

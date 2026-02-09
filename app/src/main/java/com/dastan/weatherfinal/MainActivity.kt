@@ -10,14 +10,15 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import com.dastan.weatherfinal.presentation.favorites.FavoritesScreen
 import com.dastan.weatherfinal.presentation.weather.WeatherScreen
 import com.dastan.weatherfinal.ui.theme.WeatherFinalTheme
 
+/**
+ * Main Activity: Entry point of the Weather Application.
+ * Handles the Bottom Navigation and Navigation Host.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,35 +30,35 @@ class MainActivity : ComponentActivity() {
                         NavigationBar {
                             val navBackStackEntry by navController.currentBackStackEntryAsState()
                             val currentRoute = navBackStackEntry?.destination?.route
-
+                            
+                            // Weather Screen Tab
                             NavigationBarItem(
                                 icon = { Icon(Icons.Default.Home, null) },
                                 label = { Text("Weather") },
                                 selected = currentRoute == "weather",
-                                onClick = {
+                                onClick = { 
                                     navController.navigate("weather") {
                                         popUpTo("weather") { inclusive = true }
                                     }
                                 }
                             )
+                            
+                            // Favorites Screen Tab
                             NavigationBarItem(
                                 icon = { Icon(Icons.Default.Favorite, null) },
                                 label = { Text("Favorites") },
                                 selected = currentRoute == "favorites",
-                                onClick = {
-                                    navController.navigate("favorites") {
-                                        launchSingleTop = true
-                                    }
+                                onClick = { 
+                                    navController.navigate("favorites") { 
+                                        launchSingleTop = true 
+                                    } 
                                 }
                             )
                         }
                     }
                 ) { innerPadding ->
-                    NavHost(
-                        navController = navController,
-                        startDestination = "weather",
-                        modifier = Modifier.padding(innerPadding)
-                    ) {
+                    // Navigation Host to manage screens
+                    NavHost(navController, "weather", Modifier.padding(innerPadding)) {
                         composable("weather") { WeatherScreen() }
                         composable("favorites") { FavoritesScreen() }
                     }
